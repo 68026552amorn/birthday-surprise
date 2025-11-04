@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise Birthday Login</title>
+    
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+            text-align: center;
+        }
+
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        /* --- Login Page Styles --- */
+        .login-view h1 { color: #ff6f61; margin-bottom: 20px; }
+        #birthdayInput {
+            padding: 10px; margin: 15px 0 20px; width: 80%;
+            border: 2px solid #ff6f61; border-radius: 8px; font-size: 16px;
+        }
+        button {
+            background-color: #ff6f61; color: white; border: none;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            font-size: 18px; transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover { background-color: #e55e51; transform: translateY(-2px); }
+        .error-text { color: red; font-weight: bold; margin-top: 10px; }
+
+        /* --- Main Page Styles --- */
+        .main-view { display: none; } /* ซ่อนไว้ก่อน */
+        .main-header { color: #a80077; font-size: 2.5em; }
+        .wish-text { font-size: 1.2em; margin-bottom: 30px; }
+
+        /* --- Scrolling Images --- */
+        .scrolling-images-container {
+            width: 100%; height: 150px; overflow: hidden;
+            position: relative; margin-top: 30px; border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .image-track {
+            display: flex; position: absolute; top: 0; left: 0;
+        }
+        .track-item {
+            width: 150px; height: 150px; flex-shrink: 0;
+            margin-right: 15px; overflow: hidden; border-radius: 8px;
+        }
+        .track-item img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+
+        /* --- Animations --- */
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
+        .bounce-text { animation: bounce 2s infinite; }
+        @keyframes pop { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); } }
+        .animated-pop { animation: pop 1s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animated-fade { animation: fadeIn 2s ease-in 0.5s forwards; opacity: 0; }
+        /* @keyframes scroll-animation จะถูกสร้างโดย JavaScript */
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <div id="login-view" class="login-view">
+            <h1 class="bounce-text">🎂 Welcome! 🎁</h1>
+            <p>คุณต้องใส่วันเกิดที่ถูกต้องเพื่อเข้าสู่หน้าเซอร์ไพรส์</p>
+            
+            <input type="date" id="birthdayInput" required>
+            <button onclick="checkBirthday()">เข้าสู่หน้าหลัก</button>
+            
+            <p id="message" class="error-text"></p>
+        </div>
+
+        <div id="main-view" class="main-view">
+            <h1 class="main-header animated-pop">💖 Happy Birthday! 🥳</h1>
+            <p class="wish-text animated-fade">ขอให้เป็นวันที่เต็มไปด้วยความสุขและรอยยิ้ม!</p>
+
+            <div class="scrolling-images-container">
+                <div id="image-track" class="image-track">
+                    </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // *** 🚩 แก้ไขวันเกิดที่ถูกต้องที่นี่ 🚩 ***
+        const CORRECT_BIRTHDAY = "2000-01-01"; 
+
+        // *** 🚩 แก้ไขลิงก์รูปภาพของคุณที่นี่ (ใช้ URL ออนไลน์) 🚩 ***
+        const IMAGE_URLS = [
+            "https://via.placeholder.com/400/FF69B4/FFFFFF?text=Memory+1", 
+            "https://via.placeholder.com/400/FFD700/000000?text=Memory+2", 
+            "https://via.placeholder.com/400/00CED1/FFFFFF?text=Memory+3", 
+            "https://via.placeholder.com/400/FFA07A/FFFFFF?text=Memory+4",
+            "https://via.placeholder.com/400/A200FF/FFFFFF?text=Memory+5",
+        ];
+
+        // ---------------------------------------------
+        // ตรรกะการล็อกอิน
+        // ---------------------------------------------
+        function checkBirthday() {
+            const input = document.getElementById('birthdayInput');
+            const message = document.getElementById('message');
+            
+            if (!input || !message || !input.value) {
+                message.textContent = "กรุณาเลือกวันเกิด";
+                return;
+            }
+
+            const selectedDate = input.value;
+            
+            if (selectedDate === CORRECT_BIRTHDAY) {
+                // ถ้าถูกต้อง ให้แสดงหน้าหลัก
+                document.getElementById('login-view').style.display = 'none';
+                document.getElementById('main-view').style.display = 'block';
+                setupScrollingImages(); // เริ่มการแสดงภาพวิ่ง
+            } else {
+                message.textContent = "❌ วันเกิดไม่ถูกต้อง ลองอีกครั้งนะ!";
+            }
+        }
+
+        // ---------------------------------------------
+        // ตรรกะการสร้างและเลื่อนภาพอัตโนมัติ
+        // ---------------------------------------------
+        function setupScrollingImages() {
+            const track = document.getElementById('image-track');
+            if (!track) return;
+
+            // ทำซ้ำรูปภาพ 2 ชุด เพื่อให้การเลื่อนดูต่อเนื่อง
+            const imageSets = [...IMAGE_URLS, ...IMAGE_URLS]; 
+            
+            imageSets.forEach((url, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'track-item';
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = `ภาพวิ่ง ${index + 1}`;
+                itemDiv.appendChild(img);
+                track.appendChild(itemDiv);
+            });
+
+            // คำนวณความยาวทั้งหมดและสร้าง CSS Animation
+            const trackWidth = 150; 
+            const trackMargin = 15; 
+            const totalImageWidth = IMAGE_URLS.length * (trackWidth + trackMargin); 
+            
+            track.style.width = `${totalImageWidth * 2}px`;
+
+            const keyframesName = 'scroll-animation';
+            const style = document.createElement("style");
+            document.head.appendChild(style);
+            
+            // สร้าง Keyframes สำหรับการเลื่อนจาก 0% ถึงความกว้างของแถบภาพเดียว
+            const keyframes = `@keyframes ${keyframesName} {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-${totalImageWidth}px); }
+            }`;
+            style.sheet.insertRule(keyframes, 0);
+
+            // สั่งให้ track ใช้ Animation
+            const animationDuration = IMAGE_URLS.length * 2.5; // กำหนดความเร็ว (2.5 วินาทีต่อรูป)
+            track.style.animation = `${keyframesName} ${animationDuration}s linear infinite`;
+        }
+
+        // ---------------------------------------------
+        // ตรรกะการแสดงผลเริ่มต้น: โชว์หน้า Login เสมอเมื่อโหลด
+        // ---------------------------------------------
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('login-view').style.display = 'block';
+            document.getElementById('main-view').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
