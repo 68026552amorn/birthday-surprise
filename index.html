@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise Birthday Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1 class="bounce-text">🎂 ว่าไงหมูอ้วน ใส่วันเกิดดูสิ 🎁</h1>
+        <p>คุณต้องใส่วันเกิดที่ถูกต้องเพื่อไปต่อ</p>
+        
+        <input type="date" id="birthdayInput" required>
+        <button onclick="checkBirthday()">ไปกันเลยยย</button>
+        
+        <p id="message" class="error-text"></p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
